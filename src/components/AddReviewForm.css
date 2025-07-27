@@ -1,0 +1,38 @@
+.add-review-form {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.add-review-form label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 500;
+}
+.add-review-form textarea {
+  min-height: 60px;
+  resize: vertical;
+  font-size: 1rem;
+  padding: 0.5rem;
+}
+.add-review-form select, .add-review-form button {
+  width: fit-content;
+  padding: 0.4rem 1rem;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+.add-review-form button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.add-review-form button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+} 

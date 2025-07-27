@@ -1,0 +1,121 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css');
+
+:root {
+  --primary: #000006; /* nearly black blue */
+  --secondary: #f5b50a; /* gold accent */
+  --background: #000009; /* almost black */
+  --text: #f5f6fa;
+  --card-bg: #0a0a13;
+  --border: #1a1a22;
+  --input-bg: #0a0a13;
+  --input-border: #1a1a22;
+  --shadow: 0 2px 8px rgba(0,0,6,0.12);
+}
+[data-theme='light'] {
+  --primary: #000006;
+  --secondary: #f5b50a;
+  --background: #e5e9f7;
+  --text: #000006;
+  --card-bg: #fff;
+  --border: #dbe2ef;
+  --input-bg: #fff;
+  --input-border: #dbe2ef;
+  --shadow: 0 2px 8px rgba(0,0,6,0.08);
+}
+
+body {
+  font-family: 'Montserrat', Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  margin: 0;
+  min-height: 100vh;
+  transition: background 0.3s, color 0.3s;
+  /* Add a subtle radial gradient for a faint blue glow */
+  background-image: radial-gradient(ellipse at 50% 0%, rgba(40,60,180,0.10) 0%, rgba(0,0,0,0.0) 70%);
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+a {
+  color: var(--secondary);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+a:hover {
+  color: var(--primary);
+}
+
+input, textarea, select, button {
+  font-family: inherit;
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s, border 0.2s;
+}
+
+button {
+  background: var(--secondary);
+  color: var(--primary);
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+button:hover {
+  background: var(--primary);
+  color: var(--secondary);
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--card-bg);
+  border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--primary);
+  border-radius: 6px;
+  border: 2px solid var(--card-bg);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #0056b3;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--card-bg);
+}
+
+/* Firefox scrollbar styling */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--primary) var(--card-bg);
+}
+
+/* Ensure scrollbar is always visible */
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  scrollbar-gutter: stable;
+}
+
+.card {
+  background: var(--card-bg);
+  border-radius: 10px;
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  border: 1px solid var(--border);
+}

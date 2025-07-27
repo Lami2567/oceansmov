@@ -1,0 +1,101 @@
+.home-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.home-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.home-header h1 {
+  color: var(--text);
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.refresh-btn {
+  background: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.refresh-btn:hover {
+  background: #0056b3;
+  transform: translateY(-1px);
+}
+
+.loading-container {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text);
+  font-size: 1.2rem;
+}
+
+.results-info {
+  margin-bottom: 1rem;
+  padding: 0.5rem 0;
+  color: var(--text);
+  font-size: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.results-info p {
+  margin: 0;
+  font-weight: 500;
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 2rem;
+}
+
+.no-movies {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 3rem;
+  color: var(--text);
+}
+
+.no-movies p {
+  margin: 0.5rem 0;
+  font-size: 1.1rem;
+}
+
+.no-movies p:first-child {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .home-container {
+    padding: 1rem;
+  }
+  
+  .home-header {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .home-header h1 {
+    font-size: 2rem;
+  }
+  
+  .movie-list {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+  }
+} 

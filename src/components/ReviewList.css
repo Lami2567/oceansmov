@@ -1,0 +1,36 @@
+.review-list {
+  margin-top: 2rem;
+  background: #fafafa;
+  border-radius: 8px;
+  padding: 1rem;
+}
+.review {
+  border-bottom: 1px solid #eee;
+  padding: 0.75rem 0;
+}
+.review:last-child {
+  border-bottom: none;
+}
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  font-size: 0.95rem;
+  color: #555;
+}
+.review-user {
+  font-weight: bold;
+}
+.review-rating {
+  color: #f5b50a;
+  font-size: 1.1rem;
+}
+.review-date {
+  margin-left: auto;
+  font-size: 0.9rem;
+  color: #888;
+}
+.review-comment {
+  margin-top: 0.3rem;
+  font-size: 1rem;
+} 
