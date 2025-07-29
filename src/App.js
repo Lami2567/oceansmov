@@ -8,6 +8,9 @@ import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 
+// Import debug script to show API configuration
+import './debug-api';
+
 function App() {
   return (
     <Routes>

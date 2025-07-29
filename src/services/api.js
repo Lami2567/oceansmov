@@ -1,6 +1,7 @@
 import axios from 'axios';
+import API_CONFIG from '../config';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = API_CONFIG.getApiUrl();
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -8,6 +9,11 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Debug: Log the API URL being used
+console.log('🔗 API Base URL:', API_BASE_URL);
+console.log('🌍 Environment:', process.env.NODE_ENV);
+console.log('📡 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
@@ -23,7 +29,7 @@ export const getFileUrl = (filePath) => {
   if (!filePath) return null;
   if (filePath.startsWith('http')) return filePath;
   // For production, use the same domain as the API
-  const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+  const baseUrl = API_CONFIG.getApiUrl().replace('/api', '');
   return `${baseUrl}${filePath}`;
 };
 

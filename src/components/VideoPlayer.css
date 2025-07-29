@@ -189,6 +189,35 @@
   color: #ff6b6b;
 }
 
+.video-error-actions {
+  margin-top: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.video-error-actions button {
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s ease;
+}
+
+.video-error-actions button:hover {
+  background: #0056b3;
+}
+
+.video-error-actions button:last-child {
+  background: #6c757d;
+}
+
+.video-error-actions button:last-child:hover {
+  background: #545b62;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .video-player-header {

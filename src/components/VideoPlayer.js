@@ -4,6 +4,22 @@ import '@videojs/http-streaming';
 import 'video.js/dist/video-js.css';
 import './VideoPlayer.css';
 
+// Helper function to determine video type from URL
+const getVideoType = (src) => {
+  if (!src) return 'video/mp4';
+  
+  const url = src.toLowerCase();
+  if (url.includes('.mp4')) return 'video/mp4';
+  if (url.includes('.webm')) return 'video/webm';
+  if (url.includes('.ogg')) return 'video/ogg';
+  if (url.includes('.avi')) return 'video/avi';
+  if (url.includes('.mov')) return 'video/quicktime';
+  if (url.includes('.mkv')) return 'video/x-matroska';
+  
+  // Default to mp4 if no extension found
+  return 'video/mp4';
+};
+
 const VideoPlayer = ({ 
   src, 
   poster, 
@@ -90,9 +106,11 @@ const VideoPlayer = ({
           setIsPlayerReady(true);
           
           // Set the source after player is ready
+          // Determine video type from URL or use default
+          const videoType = getVideoType(src);
           player.src({
             src: src,
-            type: 'video/mp4'
+            type: videoType
           });
           
           console.log('Video source set to:', src);
@@ -129,7 +147,33 @@ const VideoPlayer = ({
 
         player.on('error', (error) => {
           console.error('Video.js error:', error);
-          setError('Video playback error');
+          
+          // Get more specific error information
+          const playerError = player.error();
+          let errorMessage = 'Video playback error';
+          
+          if (playerError) {
+            switch (playerError.code) {
+              case 1:
+                errorMessage = 'Video loading aborted';
+                break;
+              case 2:
+                errorMessage = 'Network error - check your connection';
+                break;
+              case 3:
+                errorMessage = 'Video decoding failed - format not supported';
+                break;
+              case 4:
+                errorMessage = 'Video source not supported or server error';
+                break;
+              default:
+                errorMessage = `Video error (code: ${playerError.code})`;
+            }
+          }
+          
+          setError(errorMessage);
+          console.log('Video source URL:', src);
+          console.log('Video type:', getVideoType(src));
         });
 
         player.on('loadstart', () => {
@@ -190,6 +234,15 @@ const VideoPlayer = ({
           <div className="video-error">
             <p>Error: {error}</p>
             <p>Video source: {src}</p>
+            <p>Video type: {getVideoType(src)}</p>
+            <div className="video-error-actions">
+              <button onClick={() => window.open(src, '_blank')}>
+                Open Video in New Tab
+              </button>
+              <button onClick={() => setError(null)}>
+                Try Again
+              </button>
+            </div>
           </div>
         )}
         
