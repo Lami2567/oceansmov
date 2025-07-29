@@ -19,22 +19,33 @@ const MovieDetails = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    console.log('🔍 MovieDetails: Checking authentication...');
+    console.log('🎫 Token exists:', !!token);
+    
     if (token) {
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
+        console.log('👤 User payload:', payload);
         setUser(payload);
-      } catch {}
+      } catch (error) {
+        console.error('❌ Error parsing token:', error);
+      }
+    } else {
+      console.log('❌ No token found in localStorage');
     }
   }, []);
 
   useEffect(() => {
     const load = async () => {
+      console.log('🚀 MovieDetails: Starting to load movie data...');
       setLoading(true);
       try {
         const [movieRes, reviewsRes] = await Promise.all([
           fetchMovieDetails(id),
           fetchReviews(id)
         ]);
+        
+        console.log('📽️ Movie data loaded:', movieRes.data);
         setMovie(movieRes.data);
         setReviews(reviewsRes.data);
         
@@ -43,7 +54,19 @@ const MovieDetails = () => {
           console.log('🎬 Movie has video file, attempting to get signed URL...');
           console.log('🔗 Direct URL:', movieRes.data.movie_file_url);
           
+          // Check if user is logged in
+          const token = localStorage.getItem('token');
+          if (!token) {
+            console.log('❌ No authentication token, using direct URL');
+            const directUrl = getFileUrl(movieRes.data.movie_file_url);
+            console.log('🔗 Direct URL:', directUrl);
+            setVideoUrl(directUrl);
+            setUrlType('direct');
+            return;
+          }
+          
           try {
+            console.log('🔍 Calling getSignedVideoUrl...');
             const signedUrl = await getSignedVideoUrl(id);
             if (signedUrl) {
               console.log('✅ Signed URL obtained successfully!');
@@ -127,20 +150,20 @@ const MovieDetails = () => {
   return (
     <div className="movie-details-container">
       {/* Debug Info */}
-      {process.env.NODE_ENV === 'development' && (
-        <div style={{ 
-          background: '#f0f0f0', 
-          padding: '10px', 
-          margin: '10px 0', 
-          borderRadius: '5px',
-          fontSize: '12px'
-        }}>
-          <strong>Debug Info:</strong><br/>
-          URL Type: {urlType}<br/>
-          User Logged In: {user ? 'Yes' : 'No'}<br/>
-          Video URL: {videoUrl ? videoUrl.substring(0, 50) + '...' : 'None'}
-        </div>
-      )}
+      <div style={{ 
+        background: '#f0f0f0', 
+        padding: '10px', 
+        margin: '10px 0', 
+        borderRadius: '5px',
+        fontSize: '12px'
+      }}>
+        <strong>Debug Info:</strong><br/>
+        URL Type: {urlType}<br/>
+        User Logged In: {user ? 'Yes' : 'No'}<br/>
+        Video URL: {videoUrl ? videoUrl.substring(0, 50) + '...' : 'None'}<br/>
+        Movie ID: {id}<br/>
+        Has Video File: {movie.movie_file_url ? 'Yes' : 'No'}
+      </div>
 
       {/* Video Player Section */}
       {movie.movie_file_url && videoUrl && (
