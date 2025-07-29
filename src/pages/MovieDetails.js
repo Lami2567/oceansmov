@@ -17,6 +17,10 @@ const MovieDetails = () => {
   const [videoUrl, setVideoUrl] = useState(null);
   const [urlType, setUrlType] = useState(''); // 'signed' or 'direct'
 
+  // DEPLOYMENT TEST - This should appear in console if new code is deployed
+  console.log('🚀 DEPLOYMENT TEST: MovieDetails component loaded - NEW CODE DEPLOYED!');
+  console.log('📅 Deployment timestamp:', new Date().toISOString());
+
   useEffect(() => {
     const token = localStorage.getItem('token');
     console.log('🔍 MovieDetails: Checking authentication...');
@@ -162,7 +166,8 @@ const MovieDetails = () => {
         User Logged In: {user ? 'Yes' : 'No'}<br/>
         Video URL: {videoUrl ? videoUrl.substring(0, 50) + '...' : 'None'}<br/>
         Movie ID: {id}<br/>
-        Has Video File: {movie.movie_file_url ? 'Yes' : 'No'}
+        Has Video File: {movie.movie_file_url ? 'Yes' : 'No'}<br/>
+        <strong>DEPLOYMENT TEST: NEW CODE DEPLOYED!</strong>
       </div>
 
       {/* Video Player Section */}
