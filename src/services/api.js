@@ -33,6 +33,27 @@ export const getFileUrl = (filePath) => {
   return `${baseUrl}${filePath}`;
 };
 
+// Helper function to get signed URL for video files
+export const getSignedVideoUrl = async (movieId) => {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      console.warn('No auth token found, using direct URL');
+      return null;
+    }
+    
+    const response = await api.get(`/movies/${movieId}/video-url`);
+    if (response.data && response.data.signed_url) {
+      console.log('✅ Signed URL generated for video playback');
+      return response.data.signed_url;
+    }
+    return null;
+  } catch (error) {
+    console.warn('Failed to get signed URL, using direct URL:', error.message);
+    return null;
+  }
+};
+
 // Movies with enhanced search and filtering
 export const fetchMovies = (params = {}) => api.get('/movies', { params });
 export const fetchMovieDetails = (id) => api.get(`/movies/${id}`);

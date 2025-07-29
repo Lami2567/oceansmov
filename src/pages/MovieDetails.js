@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchMovieDetails, fetchReviews, addReview, getFileUrl } from '../services/api';
+import { fetchMovieDetails, fetchReviews, addReview, getFileUrl, getSignedVideoUrl } from '../services/api';
 import ReviewList from '../components/ReviewList';
 import AddReviewForm from '../components/AddReviewForm';
 import VideoPlayer from '../components/VideoPlayer';
@@ -14,6 +14,7 @@ const MovieDetails = () => {
   const [reviewLoading, setReviewLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  const [videoUrl, setVideoUrl] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -35,6 +36,23 @@ const MovieDetails = () => {
         ]);
         setMovie(movieRes.data);
         setReviews(reviewsRes.data);
+        
+        // Get signed URL for video if available
+        if (movieRes.data.movie_file_url) {
+          try {
+            const signedUrl = await getSignedVideoUrl(id);
+            if (signedUrl) {
+              console.log('🎬 Using signed URL for video playback');
+              setVideoUrl(signedUrl);
+            } else {
+              console.log('🎬 Using direct URL for video playback');
+              setVideoUrl(getFileUrl(movieRes.data.movie_file_url));
+            }
+          } catch (error) {
+            console.warn('Failed to get signed URL, using direct URL:', error);
+            setVideoUrl(getFileUrl(movieRes.data.movie_file_url));
+          }
+        }
       } catch (err) {
         console.error('Error loading movie:', err);
         setError('Failed to load movie.');
@@ -88,19 +106,18 @@ const MovieDetails = () => {
   if (loading) return <div className="movie-details-container"><p>Loading...</p></div>;
   if (!movie) return <div className="movie-details-container"><p>{error || 'Movie not found.'}</p></div>;
 
-  const videoUrl = movie.movie_file_url ? getFileUrl(movie.movie_file_url) : null;
   const posterUrl = movie.poster_url ? getFileUrl(movie.poster_url) : null;
 
   return (
     <div className="movie-details-container">
       {/* Video Player Section */}
-      {movie.movie_file_url && (
+      {movie.movie_file_url && videoUrl && (
         <div className="video-section">
           <VideoPlayer
             key={videoUrl} // Force recreation when video URL changes
             src={videoUrl}
-            title={movie.title}
             poster={posterUrl}
+            title={movie.title}
             onReady={handlePlayerReady}
             onPlay={handlePlayerPlay}
             onPause={handlePlayerPause}
@@ -109,46 +126,39 @@ const MovieDetails = () => {
             onVolumeChange={handleVolumeChange}
             onQualityChange={handleQualityChange}
             autoPlay={false}
-            muted={false}
+            muted={true}
             preload="metadata"
           />
         </div>
       )}
-      
-      {/* Movie Info Section */}
-      <div className="movie-info-section">
-        <div className="movie-details-header">
-          <div className="movie-poster-section">
-            <img
-              src={movie.poster_url ? getFileUrl(movie.poster_url) : '/default-poster.png'}
-              alt={movie.title}
-              className="movie-details-poster"
-              onError={(e) => {
-                e.target.src = '/default-poster.png';
-              }}
-            />
-          </div>
-          <div className="movie-details-info">
-            <h1 className="movie-title">{movie.title}</h1>
-            <div className="movie-meta">
-              <span className="movie-year">{movie.release_year}</span>
-              <span className="movie-genre">{movie.genre}</span>
-            </div>
-            <p className="movie-description">{movie.description}</p>
+
+      {/* Movie Information */}
+      <div className="movie-info">
+        <div className="movie-header">
+          <h1>{movie.title}</h1>
+          <div className="movie-meta">
+            <span className="year">{movie.release_year}</span>
+            <span className="genre">{movie.genre}</span>
+            <span className="director">Director: {movie.director}</span>
           </div>
         </div>
+        
+        <div className="movie-description">
+          <p>{movie.description}</p>
+        </div>
       </div>
-      
+
       {/* Reviews Section */}
       <div className="reviews-section">
-        <h2>Reviews & Ratings</h2>
-        <ReviewList reviews={reviews} />
+        <h2>Reviews</h2>
         {user && (
-          <AddReviewForm onSubmit={handleAddReview} loading={reviewLoading} />
+          <AddReviewForm 
+            onSubmit={handleAddReview} 
+            loading={reviewLoading}
+          />
         )}
+        <ReviewList reviews={reviews} />
       </div>
-      
-      {error && <p className="error-message">{error}</p>}
     </div>
   );
 };
