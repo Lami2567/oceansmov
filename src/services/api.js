@@ -14,6 +14,7 @@ const api = axios.create({
 console.log('🔗 API Base URL:', API_BASE_URL);
 console.log('🌍 Environment:', process.env.NODE_ENV);
 console.log('📡 REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
+console.log('☁️ Storage Provider:', API_CONFIG.R2_CONFIG.STORAGE_PROVIDER);
 
 // Add auth token to requests
 api.interceptors.request.use((config) => {
@@ -24,45 +25,123 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// Helper function to get full URL for files
+// Helper function to get full URL for files (optimized for R2)
 export const getFileUrl = (filePath) => {
   if (!filePath) return null;
-  if (filePath.startsWith('http')) return filePath;
-  // For production, use the same domain as the API
+  
+  // If it's already a full URL (R2 URLs are full URLs), return as is
+  if (filePath.startsWith('http')) {
+    console.log('🔗 Using direct R2 URL:', filePath);
+    return filePath;
+  }
+  
+  // For legacy local files (fallback)
   const baseUrl = API_CONFIG.getApiUrl().replace('/api', '');
   return `${baseUrl}${filePath}`;
 };
 
-// Helper function to get signed URL for video files
+// Enhanced helper function to get signed URL for video files (R2 optimized)
 export const getSignedVideoUrl = async (movieId) => {
   try {
     const token = localStorage.getItem('token');
-    console.log('🔍 Checking authentication for signed URL...');
+    console.log('🔍 Checking authentication for R2 signed URL...');
     console.log('🎫 Token exists:', !!token);
     
     if (!token) {
-      console.log('❌ No auth token found, cannot get signed URL');
+      console.log('❌ No auth token found, cannot get R2 signed URL');
       return null;
     }
     
-    console.log('🔗 Requesting signed URL from backend...');
+    console.log('🔗 Requesting R2 signed URL from backend...');
     const response = await api.get(`/movies/${movieId}/video-url`);
     
     console.log('📡 Backend response status:', response.status);
     console.log('📡 Backend response data:', response.data);
     
     if (response.data && response.data.signed_url) {
-      console.log('✅ Signed URL generated successfully!');
+      console.log('✅ R2 signed URL generated successfully!');
       console.log('🔗 Signed URL length:', response.data.signed_url.length);
+      console.log('⏰ Expires in:', response.data.expires_in, 'seconds');
+      
+      // Check if it's an R2 URL
+      if (response.data.signed_url.includes('r2.dev') || response.data.signed_url.includes('cloudflare')) {
+        console.log('☁️ Confirmed: Using Cloudflare R2 signed URL');
+      }
+      
       return response.data.signed_url;
     } else {
       console.log('❌ No signed URL in response');
       return null;
     }
   } catch (error) {
-    console.error('❌ Error getting signed URL:', error);
+    console.error('❌ Error getting R2 signed URL:', error);
     console.error('❌ Error details:', error.response?.data || error.message);
+    
+    // Check if it's an authentication error
+    if (error.response?.status === 401) {
+      console.log('🔐 Authentication required for R2 signed URLs');
+    } else if (error.response?.status === 404) {
+      console.log('📹 Video file not found in R2');
+    }
+    
     return null;
+  }
+};
+
+// Enhanced file upload functions for R2
+export const uploadPoster = async (movieId, posterFile, onProgress) => {
+  console.log('📤 Uploading poster to R2...');
+  console.log('📁 File:', posterFile.name, 'Size:', posterFile.size);
+  
+  const formData = new FormData();
+  formData.append('poster', posterFile);
+  
+  try {
+    const response = await api.post(`/movies/${movieId}/poster`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      }
+    });
+    
+    console.log('✅ Poster uploaded to R2 successfully!');
+    console.log('🔗 R2 URL:', response.data.poster_url);
+    return response;
+  } catch (error) {
+    console.error('❌ Error uploading poster to R2:', error);
+    throw error;
+  }
+};
+
+// Enhanced movie file upload for R2
+export const uploadMovieFile = async (movieId, movieFile, onProgress) => {
+  console.log('📤 Uploading movie file to R2...');
+  console.log('📁 File:', movieFile.name, 'Size:', movieFile.size);
+  console.log('🎬 File type:', movieFile.type);
+  
+  const formData = new FormData();
+  formData.append('movieFile', movieFile);
+  
+  try {
+    const response = await api.post(`/movies/${movieId}/movie`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      onUploadProgress: (progressEvent) => {
+        if (onProgress) {
+          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+          onProgress(percentCompleted);
+        }
+      }
+    });
+    
+    console.log('✅ Movie file uploaded to R2 successfully!');
+    console.log('🔗 R2 URL:', response.data.movie_file_url);
+    return response;
+  } catch (error) {
+    console.error('❌ Error uploading movie file to R2:', error);
+    throw error;
   }
 };
 
@@ -86,26 +165,6 @@ export const filterMovies = (filters = {}) => {
 // Get available genres and years for filters
 export const fetchGenres = () => api.get('/movies/genres');
 export const fetchYears = () => api.get('/movies/years');
-
-// Upload movie poster with progress tracking
-export const uploadPoster = async (movieId, posterFile, onProgress) => {
-  const formData = new FormData();
-  formData.append('poster', posterFile);
-  return api.post(`/movies/${movieId}/poster`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: onProgress
-  });
-};
-
-// Upload movie file with progress tracking
-export const uploadMovieFile = async (movieId, movieFile, onProgress) => {
-  const formData = new FormData();
-  formData.append('movieFile', movieFile);
-  return api.post(`/movies/${movieId}/movie`, formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-    onUploadProgress: onProgress
-  });
-};
 
 // Auth
 export const register = (data) => api.post('/users/register', data);

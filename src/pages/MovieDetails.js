@@ -16,10 +16,12 @@ const MovieDetails = () => {
   const [user, setUser] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
   const [urlType, setUrlType] = useState(''); // 'signed' or 'direct'
+  const [storageInfo, setStorageInfo] = useState(''); // R2 storage info
 
   // DEPLOYMENT TEST - This should appear in console if new code is deployed
-  console.log('🚀 DEPLOYMENT TEST: MovieDetails component loaded - NEW CODE DEPLOYED!');
+  console.log('🚀 DEPLOYMENT TEST: MovieDetails component loaded - R2 CONFIGURED!');
   console.log('📅 Deployment timestamp:', new Date().toISOString());
+  console.log('☁️ Storage: Cloudflare R2');
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -41,7 +43,7 @@ const MovieDetails = () => {
 
   useEffect(() => {
     const load = async () => {
-      console.log('🚀 MovieDetails: Starting to load movie data...');
+      console.log('🚀 MovieDetails: Starting to load movie data from R2 backend...');
       setLoading(true);
       try {
         const [movieRes, reviewsRes] = await Promise.all([
@@ -55,40 +57,46 @@ const MovieDetails = () => {
         
         // Get signed URL for video if available
         if (movieRes.data.movie_file_url) {
-          console.log('🎬 Movie has video file, attempting to get signed URL...');
-          console.log('🔗 Direct URL:', movieRes.data.movie_file_url);
+          console.log('🎬 Movie has video file, attempting to get R2 signed URL...');
+          console.log('🔗 Direct R2 URL:', movieRes.data.movie_file_url);
+          
+          // Check if it's an R2 URL
+          if (movieRes.data.movie_file_url.includes('r2.dev') || movieRes.data.movie_file_url.includes('cloudflare')) {
+            setStorageInfo('☁️ Cloudflare R2 Storage');
+            console.log('☁️ Confirmed: Video stored in Cloudflare R2');
+          }
           
           // Check if user is logged in
           const token = localStorage.getItem('token');
           if (!token) {
-            console.log('❌ No authentication token, using direct URL');
+            console.log('❌ No authentication token, using direct R2 URL');
             const directUrl = getFileUrl(movieRes.data.movie_file_url);
-            console.log('🔗 Direct URL:', directUrl);
+            console.log('🔗 Direct R2 URL:', directUrl);
             setVideoUrl(directUrl);
             setUrlType('direct');
             return;
           }
           
           try {
-            console.log('🔍 Calling getSignedVideoUrl...');
+            console.log('🔍 Calling getSignedVideoUrl for R2...');
             const signedUrl = await getSignedVideoUrl(id);
             if (signedUrl) {
-              console.log('✅ Signed URL obtained successfully!');
+              console.log('✅ R2 signed URL obtained successfully!');
               console.log('🔗 Signed URL:', signedUrl.substring(0, 100) + '...');
               setVideoUrl(signedUrl);
               setUrlType('signed');
             } else {
-              console.log('⚠️ Signed URL generation failed, using direct URL');
+              console.log('⚠️ R2 signed URL generation failed, using direct R2 URL');
               const directUrl = getFileUrl(movieRes.data.movie_file_url);
-              console.log('🔗 Direct URL:', directUrl);
+              console.log('🔗 Direct R2 URL:', directUrl);
               setVideoUrl(directUrl);
               setUrlType('direct');
             }
           } catch (error) {
-            console.error('❌ Error getting signed URL:', error);
-            console.log('🔄 Falling back to direct URL');
+            console.error('❌ Error getting R2 signed URL:', error);
+            console.log('🔄 Falling back to direct R2 URL');
             const directUrl = getFileUrl(movieRes.data.movie_file_url);
-            console.log('🔗 Direct URL:', directUrl);
+            console.log('🔗 Direct R2 URL:', directUrl);
             setVideoUrl(directUrl);
             setUrlType('direct');
           }
@@ -98,125 +106,143 @@ const MovieDetails = () => {
       } catch (err) {
         console.error('Error loading movie:', err);
         setError('Failed to load movie.');
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
+
     load();
   }, [id]);
 
   const handleAddReview = async ({ rating, comment }) => {
     setReviewLoading(true);
-    setError('');
     try {
-      await addReview({ movie_id: id, rating, comment });
-      const reviewsRes = await fetchReviews(id);
-      setReviews(reviewsRes.data);
+      const response = await addReview({
+        movie_id: id,
+        rating,
+        comment
+      });
+      setReviews([...reviews, response.data]);
+      setReviewLoading(false);
     } catch (err) {
-      setError('Failed to add review.');
+      console.error('Error adding review:', err);
+      setReviewLoading(false);
     }
-    setReviewLoading(false);
   };
 
   const handlePlayerReady = (player) => {
-    console.log('Video player is ready');
-    console.log(`🎬 Using ${urlType} URL for video playback`);
+    console.log('🎬 Video player ready for R2 content');
+    console.log('🔗 Video URL type:', urlType);
+    console.log('☁️ Storage:', storageInfo);
   };
 
   const handlePlayerPlay = () => {
-    console.log('Video started playing');
+    console.log('▶️ Video started playing from R2');
   };
 
   const handlePlayerPause = () => {
-    console.log('Video paused');
+    console.log('⏸️ Video paused');
   };
 
   const handlePlayerEnded = () => {
-    console.log('Video ended');
+    console.log('🏁 Video ended');
   };
 
   const handleTimeUpdate = (currentTime) => {
-    // Optional: Track viewing progress
+    // Optional: Track playback progress
   };
 
   const handleVolumeChange = (volume) => {
-    console.log(`Volume changed to: ${Math.round(volume * 100)}%`);
+    // Optional: Track volume changes
   };
 
   const handleQualityChange = (qualityLevel) => {
-    console.log(`Quality changed to: ${qualityLevel.width}x${qualityLevel.height}`);
+    console.log('🎛️ Quality changed to:', qualityLevel);
   };
 
-  if (loading) return <div className="movie-details-container"><p>Loading...</p></div>;
-  if (!movie) return <div className="movie-details-container"><p>{error || 'Movie not found.'}</p></div>;
+  if (loading) {
+    return (
+      <div className="movie-details-container">
+        <div className="loading">Loading movie details...</div>
+      </div>
+    );
+  }
 
-  const posterUrl = movie.poster_url ? getFileUrl(movie.poster_url) : null;
+  if (error) {
+    return (
+      <div className="movie-details-container">
+        <div className="error">{error}</div>
+      </div>
+    );
+  }
+
+  if (!movie) {
+    return (
+      <div className="movie-details-container">
+        <div className="error">Movie not found.</div>
+      </div>
+    );
+  }
 
   return (
     <div className="movie-details-container">
-      {/* Debug Info */}
-      <div style={{ 
-        background: '#f0f0f0', 
-        padding: '10px', 
-        margin: '10px 0', 
-        borderRadius: '5px',
-        fontSize: '12px'
-      }}>
-        <strong>Debug Info:</strong><br/>
-        URL Type: {urlType}<br/>
-        User Logged In: {user ? 'Yes' : 'No'}<br/>
-        Video URL: {videoUrl ? videoUrl.substring(0, 50) + '...' : 'None'}<br/>
-        Movie ID: {id}<br/>
-        Has Video File: {movie.movie_file_url ? 'Yes' : 'No'}<br/>
-        <strong>DEPLOYMENT TEST: NEW CODE DEPLOYED!</strong>
-      </div>
-
-      {/* Video Player Section */}
-      {movie.movie_file_url && videoUrl && (
-        <div className="video-section">
-          <VideoPlayer
-            key={videoUrl} // Force recreation when video URL changes
-            src={videoUrl}
-            poster={posterUrl}
-            title={movie.title}
-            onReady={handlePlayerReady}
-            onPlay={handlePlayerPlay}
-            onPause={handlePlayerPause}
-            onEnded={handlePlayerEnded}
-            onTimeUpdate={handleTimeUpdate}
-            onVolumeChange={handleVolumeChange}
-            onQualityChange={handleQualityChange}
-            autoPlay={false}
-            muted={true}
-            preload="metadata"
-          />
-        </div>
-      )}
-
-      {/* Movie Information */}
-      <div className="movie-info">
-        <div className="movie-header">
-          <h1>{movie.title}</h1>
-          <div className="movie-meta">
-            <span className="year">{movie.release_year}</span>
-            <span className="genre">{movie.genre}</span>
-            <span className="director">Director: {movie.director}</span>
+      <div className="movie-header">
+        <h1>{movie.title}</h1>
+        {storageInfo && (
+          <div className="storage-info">
+            <span className="storage-badge">{storageInfo}</span>
+            {urlType === 'signed' && <span className="security-badge">🔐 Secure Access</span>}
           </div>
+        )}
+      </div>
+      
+      <div className="movie-content">
+        <div className="movie-poster">
+          {movie.poster_url ? (
+            <img 
+              src={getFileUrl(movie.poster_url)} 
+              alt={movie.title}
+              onError={(e) => {
+                console.log('❌ Poster image failed to load from R2');
+                e.target.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="no-poster">No poster available</div>
+          )}
         </div>
         
-        <div className="movie-description">
-          <p>{movie.description}</p>
+        <div className="movie-info">
+          <p><strong>Year:</strong> {movie.year}</p>
+          <p><strong>Genre:</strong> {movie.genre}</p>
+          <p><strong>Description:</strong> {movie.description}</p>
+          <p><strong>Rating:</strong> {movie.rating}/10</p>
+          
+          {videoUrl && (
+            <div className="video-section">
+              <h3>Watch Movie</h3>
+              <VideoPlayer
+                src={videoUrl}
+                poster={getFileUrl(movie.poster_url)}
+                title={movie.title}
+                onReady={handlePlayerReady}
+                onPlay={handlePlayerPlay}
+                onPause={handlePlayerPause}
+                onEnded={handlePlayerEnded}
+                onTimeUpdate={handleTimeUpdate}
+                onVolumeChange={handleVolumeChange}
+                onQualityChange={handleQualityChange}
+                autoPlay={false}
+                muted={true}
+              />
+            </div>
+          )}
         </div>
       </div>
-
-      {/* Reviews Section */}
+      
       <div className="reviews-section">
-        <h2>Reviews</h2>
-        {user && (
-          <AddReviewForm 
-            onSubmit={handleAddReview} 
-            loading={reviewLoading}
-          />
-        )}
+        <h3>Reviews</h3>
+        {user && <AddReviewForm onSubmit={handleAddReview} loading={reviewLoading} />}
         <ReviewList reviews={reviews} />
       </div>
     </div>
