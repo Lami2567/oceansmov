@@ -37,19 +37,31 @@ export const getFileUrl = (filePath) => {
 export const getSignedVideoUrl = async (movieId) => {
   try {
     const token = localStorage.getItem('token');
+    console.log('🔍 Checking authentication for signed URL...');
+    console.log('🎫 Token exists:', !!token);
+    
     if (!token) {
-      console.warn('No auth token found, using direct URL');
+      console.log('❌ No auth token found, cannot get signed URL');
       return null;
     }
     
+    console.log('🔗 Requesting signed URL from backend...');
     const response = await api.get(`/movies/${movieId}/video-url`);
+    
+    console.log('📡 Backend response status:', response.status);
+    console.log('📡 Backend response data:', response.data);
+    
     if (response.data && response.data.signed_url) {
-      console.log('✅ Signed URL generated for video playback');
+      console.log('✅ Signed URL generated successfully!');
+      console.log('🔗 Signed URL length:', response.data.signed_url.length);
       return response.data.signed_url;
+    } else {
+      console.log('❌ No signed URL in response');
+      return null;
     }
-    return null;
   } catch (error) {
-    console.warn('Failed to get signed URL, using direct URL:', error.message);
+    console.error('❌ Error getting signed URL:', error);
+    console.error('❌ Error details:', error.response?.data || error.message);
     return null;
   }
 };

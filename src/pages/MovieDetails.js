@@ -15,6 +15,7 @@ const MovieDetails = () => {
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [videoUrl, setVideoUrl] = useState(null);
+  const [urlType, setUrlType] = useState(''); // 'signed' or 'direct'
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -39,19 +40,33 @@ const MovieDetails = () => {
         
         // Get signed URL for video if available
         if (movieRes.data.movie_file_url) {
+          console.log('🎬 Movie has video file, attempting to get signed URL...');
+          console.log('🔗 Direct URL:', movieRes.data.movie_file_url);
+          
           try {
             const signedUrl = await getSignedVideoUrl(id);
             if (signedUrl) {
-              console.log('🎬 Using signed URL for video playback');
+              console.log('✅ Signed URL obtained successfully!');
+              console.log('🔗 Signed URL:', signedUrl.substring(0, 100) + '...');
               setVideoUrl(signedUrl);
+              setUrlType('signed');
             } else {
-              console.log('🎬 Using direct URL for video playback');
-              setVideoUrl(getFileUrl(movieRes.data.movie_file_url));
+              console.log('⚠️ Signed URL generation failed, using direct URL');
+              const directUrl = getFileUrl(movieRes.data.movie_file_url);
+              console.log('🔗 Direct URL:', directUrl);
+              setVideoUrl(directUrl);
+              setUrlType('direct');
             }
           } catch (error) {
-            console.warn('Failed to get signed URL, using direct URL:', error);
-            setVideoUrl(getFileUrl(movieRes.data.movie_file_url));
+            console.error('❌ Error getting signed URL:', error);
+            console.log('🔄 Falling back to direct URL');
+            const directUrl = getFileUrl(movieRes.data.movie_file_url);
+            console.log('🔗 Direct URL:', directUrl);
+            setVideoUrl(directUrl);
+            setUrlType('direct');
           }
+        } else {
+          console.log('❌ No video file found for this movie');
         }
       } catch (err) {
         console.error('Error loading movie:', err);
@@ -77,6 +92,7 @@ const MovieDetails = () => {
 
   const handlePlayerReady = (player) => {
     console.log('Video player is ready');
+    console.log(`🎬 Using ${urlType} URL for video playback`);
   };
 
   const handlePlayerPlay = () => {
@@ -110,6 +126,22 @@ const MovieDetails = () => {
 
   return (
     <div className="movie-details-container">
+      {/* Debug Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div style={{ 
+          background: '#f0f0f0', 
+          padding: '10px', 
+          margin: '10px 0', 
+          borderRadius: '5px',
+          fontSize: '12px'
+        }}>
+          <strong>Debug Info:</strong><br/>
+          URL Type: {urlType}<br/>
+          User Logged In: {user ? 'Yes' : 'No'}<br/>
+          Video URL: {videoUrl ? videoUrl.substring(0, 50) + '...' : 'None'}
+        </div>
+      )}
+
       {/* Video Player Section */}
       {movie.movie_file_url && videoUrl && (
         <div className="video-section">
