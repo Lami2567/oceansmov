@@ -15,7 +15,7 @@ const Home = () => {
       const params = { ...filters };
       const res = await fetchMovies(params);
       console.log('Loaded movies:', res.data);
-      setMovies(res.data);
+      setMovies(res.data.data || res.data || []);
     } catch (err) {
       console.error('Error loading movies:', err);
       setMovies([]);

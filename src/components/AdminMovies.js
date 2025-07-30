@@ -28,7 +28,7 @@ const AdminMovies = () => {
     setLoading(true);
     try {
       const res = await fetchMovies();
-      setMovies(res.data);
+      setMovies(res.data.data || res.data || []);
       console.log('📽️ Loaded movies from R2 backend');
     } catch (err) {
       setError('Failed to load movies');
