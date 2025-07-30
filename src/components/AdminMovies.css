@@ -3,6 +3,8 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+  background: #f8f9fa;
+  min-height: 100vh;
 }
 
 .admin-header {
@@ -11,7 +13,11 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 2px solid #f0f0f0;
+  border-bottom: 2px solid #e9ecef;
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .admin-header h2 {
@@ -74,7 +80,7 @@
 
 /* Upload Progress Container */
 .upload-progress-container {
-  background: #f8f9fa;
+  background: white;
   border: 2px solid #e9ecef;
   border-radius: 12px;
   padding: 20px;
@@ -97,7 +103,7 @@
   display: block;
   margin-bottom: 8px;
   font-weight: 600;
-  color: #555;
+  color: #333;
 }
 
 .progress-bar {
@@ -150,8 +156,11 @@
 .loading-container {
   text-align: center;
   padding: 40px;
-  color: #6c757d;
+  color: #333;
   font-size: 1.1rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Admin Movie Table */
@@ -178,6 +187,7 @@
   padding: 15px;
   border-bottom: 1px solid #f0f0f0;
   vertical-align: middle;
+  color: #333;
 }
 
 .admin-movie-table tr:hover {
@@ -252,15 +262,17 @@
   text-align: center;
   padding: 60px 20px;
   color: #6c757d;
-  background: #f8f9fa;
+  background: white;
   border-radius: 12px;
   border: 2px dashed #dee2e6;
   margin: 20px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .empty-state p {
   font-size: 1.1rem;
   margin: 0;
+  color: #333;
 }
 
 /* Responsive Design */

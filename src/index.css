@@ -12,6 +12,7 @@
   --input-border: #1a1a22;
   --shadow: 0 2px 8px rgba(0,0,6,0.12);
 }
+
 [data-theme='light'] {
   --primary: #000006;
   --secondary: #f5b50a;
@@ -45,10 +46,52 @@ a {
   text-decoration: none;
   transition: color 0.2s;
 }
+
 a:hover {
   color: var(--primary);
 }
 
+/* Admin Dashboard Specific Overrides */
+.admin-movies,
+.movie-form-container {
+  --text: #333;
+  --card-bg: #fff;
+  --input-bg: #fff;
+  --input-border: #e9ecef;
+  --border: #e9ecef;
+}
+
+.admin-movies input,
+.admin-movies textarea,
+.admin-movies select,
+.movie-form input,
+.movie-form textarea,
+.movie-form select {
+  background: var(--input-bg);
+  color: var(--text);
+  border: 1px solid var(--input-border);
+}
+
+.admin-movies input:focus,
+.admin-movies textarea:focus,
+.admin-movies select:focus,
+.movie-form input:focus,
+.movie-form textarea:focus,
+.movie-form select:focus {
+  background: #fff;
+  color: #333;
+  border-color: #667eea;
+}
+
+.admin-movies input::placeholder,
+.admin-movies textarea::placeholder,
+.movie-form input::placeholder,
+.movie-form textarea::placeholder {
+  color: #6c757d;
+  opacity: 0.7;
+}
+
+/* General form styling */
 input, textarea, select, button {
   font-family: inherit;
   background: var(--input-bg);
@@ -66,6 +109,7 @@ button {
   cursor: pointer;
   box-shadow: var(--shadow);
 }
+
 button:hover {
   background: var(--primary);
   color: var(--secondary);
