@@ -122,11 +122,25 @@ const VideoPlayer = ({
         player.on('play', () => {
           console.log('Video started playing');
           setError(null);
+          
+          // Hide the big play button when video starts playing
+          const bigPlayButton = player.el().querySelector('.vjs-big-play-button');
+          if (bigPlayButton) {
+            bigPlayButton.style.display = 'none';
+          }
+          
           if (onPlay) onPlay();
         });
 
         player.on('pause', () => {
           console.log('Video paused');
+          
+          // Show the big play button when video is paused
+          const bigPlayButton = player.el().querySelector('.vjs-big-play-button');
+          if (bigPlayButton) {
+            bigPlayButton.style.display = 'block';
+          }
+          
           if (onPause) onPause();
         });
 
@@ -189,6 +203,16 @@ const VideoPlayer = ({
 
         player.on('canplay', () => {
           console.log('Video can start playing');
+        });
+
+        // Add click handler for big play button
+        player.on('click', () => {
+          console.log('Video player clicked');
+          if (player.paused()) {
+            player.play();
+          } else {
+            player.pause();
+          }
         });
 
       } catch (err) {
