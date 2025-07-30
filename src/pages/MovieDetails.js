@@ -52,28 +52,30 @@ const MovieDetails = () => {
         ]);
         
         console.log('📽️ Movie data loaded:', movieRes.data);
-        setMovie(movieRes.data);
+        const movieData = movieRes.data.data || movieRes.data; // Handle nested data structure
+        setMovie(movieData);
         setReviews(reviewsRes.data);
         
         // Get video URL for playback
-        if (movieRes.data.movie_file_url) {
+        if (movieData.movie_file_url) {
           console.log('🎬 Movie has video file, setting up R2 video playback...');
-          console.log('🔗 R2 URL:', movieRes.data.movie_file_url);
+          console.log('🔗 R2 URL:', movieData.movie_file_url);
           
           // Check if it's an R2 URL
-          if (movieRes.data.movie_file_url.includes('r2.dev') || movieRes.data.movie_file_url.includes('cloudflare')) {
+          if (movieData.movie_file_url.includes('r2.dev') || movieData.movie_file_url.includes('cloudflare')) {
             setStorageInfo('☁️ Cloudflare R2 Storage');
             console.log('☁️ Confirmed: Video stored in Cloudflare R2');
           }
           
           // For R2 videos, use direct URLs for public access
           // Signed URLs are only needed for private content
-          const directUrl = getFileUrl(movieRes.data.movie_file_url);
+          const directUrl = getFileUrl(movieData.movie_file_url);
           console.log('🔗 Using direct R2 URL for public access:', directUrl);
           setVideoUrl(directUrl);
           setUrlType('direct');
         } else {
           console.log('❌ No video file found for this movie');
+          console.log('🔍 Available movie properties:', Object.keys(movieData));
         }
       } catch (err) {
         console.error('Error loading movie:', err);
