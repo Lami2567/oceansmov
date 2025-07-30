@@ -48,6 +48,9 @@
   width: 100%;
   background: #000;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Video.js styling - ensure proper display */
@@ -56,6 +59,9 @@
   height: auto !important;
   background: #000;
   position: relative;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 /* Ensure video element is properly sized */
@@ -102,11 +108,12 @@
   font-size: 2rem;
   color: #fff;
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
   z-index: 5;
   transition: opacity 0.3s ease, visibility 0.3s ease;
+  margin: 0 !important;
 }
 
 /* Hide big play button when video is playing */
