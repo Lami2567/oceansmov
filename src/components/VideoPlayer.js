@@ -74,10 +74,8 @@ const VideoPlayer = ({
         // Create player with explicit settings
         const player = videojs(videoRef.current, {
           controls: true,
-          responsive: false,
-          fluid: false,
-          width: '100%',
-          height: '400px',
+          responsive: true,
+          fluid: true,
           preload: preload,
           autoplay: autoPlay,
           muted: muted,

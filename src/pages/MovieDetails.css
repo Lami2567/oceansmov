@@ -14,8 +14,8 @@
   margin: 0 auto 30px auto;
   background: #000;
   border-radius: 8px;
-  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
 }
 
 .video-section-top video,
@@ -23,6 +23,24 @@
   width: 100% !important;
   height: auto !important;
   aspect-ratio: 16/9;
+  display: block;
+}
+
+/* Ensure video controls are visible */
+.video-section-top .video-js .vjs-control-bar {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.video-section-top .video-js .vjs-big-play-button {
+  display: block !important;
+  visibility: visible !important;
+}
+
+/* Remove overflow hidden to prevent cutting off controls */
+.video-section-top .video-js {
+  overflow: visible !important;
 }
 
 .movie-header {
@@ -189,6 +207,11 @@
   .video-section-top {
     width: 100%;
     margin: 0 auto 20px auto;
+    border-radius: 4px;
+  }
+  
+  .video-section-top .video-js {
+    border-radius: 4px;
   }
   
   .movie-content {
