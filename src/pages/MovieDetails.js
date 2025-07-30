@@ -170,6 +170,26 @@ const MovieDetails = () => {
         )}
       </div>
       
+      {/* Video Player Section - Top Priority */}
+      {videoUrl && (
+        <div className="video-section-top">
+          <VideoPlayer
+            src={videoUrl}
+            poster={getFileUrl(movie.poster_url)}
+            title={movie.title}
+            onReady={handlePlayerReady}
+            onPlay={handlePlayerPlay}
+            onPause={handlePlayerPause}
+            onEnded={handlePlayerEnded}
+            onTimeUpdate={handleTimeUpdate}
+            onVolumeChange={handleVolumeChange}
+            onQualityChange={handleQualityChange}
+            autoPlay={false}
+            muted={true}
+          />
+        </div>
+      )}
+      
       <div className="movie-content">
         <div className="movie-poster">
           {movie.poster_url ? (
@@ -187,30 +207,9 @@ const MovieDetails = () => {
         </div>
         
         <div className="movie-info">
-          <p><strong>Year:</strong> {movie.year}</p>
+          <p><strong>Year:</strong> {movie.release_year}</p>
           <p><strong>Genre:</strong> {movie.genre}</p>
           <p><strong>Description:</strong> {movie.description}</p>
-          <p><strong>Rating:</strong> {movie.rating}/10</p>
-          
-          {videoUrl && (
-            <div className="video-section">
-              <h3>Watch Movie</h3>
-              <VideoPlayer
-                src={videoUrl}
-                poster={getFileUrl(movie.poster_url)}
-                title={movie.title}
-                onReady={handlePlayerReady}
-                onPlay={handlePlayerPlay}
-                onPause={handlePlayerPause}
-                onEnded={handlePlayerEnded}
-                onTimeUpdate={handleTimeUpdate}
-                onVolumeChange={handleVolumeChange}
-                onQualityChange={handleQualityChange}
-                autoPlay={false}
-                muted={true}
-              />
-            </div>
-          )}
         </div>
       </div>
       

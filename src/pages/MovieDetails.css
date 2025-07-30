@@ -8,6 +8,23 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Video Player Section - Top Priority */
+.video-section-top {
+  width: 75%;
+  margin: 0 auto 30px auto;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.video-section-top video,
+.video-section-top .video-js {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16/9;
+}
+
 .movie-header {
   display: flex;
   justify-content: space-between;
@@ -166,6 +183,12 @@
   .storage-info {
     flex-direction: column;
     gap: 8px;
+  }
+  
+  /* Video Player - Full width on mobile */
+  .video-section-top {
+    width: 100%;
+    margin: 0 auto 20px auto;
   }
   
   .movie-content {
