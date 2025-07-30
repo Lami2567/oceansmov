@@ -63,7 +63,7 @@ const AdminMovies = () => {
     
     try {
       const res = await createMovie(data);
-      let movie = res.data;
+      let movie = res.data.data || res.data;
       console.log('✅ Movie created, ID:', movie.id);
       
       // Upload poster to R2 if provided
@@ -74,7 +74,7 @@ const AdminMovies = () => {
           movie.id, 
           data.poster, 
           (progressEvent) => {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            const progress = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
             setUploadProgress(prev => ({ ...prev, poster: progress }));
             console.log(`📤 Poster upload progress: ${progress}%`);
           }
@@ -122,7 +122,7 @@ const AdminMovies = () => {
     
     try {
       const res = await updateMovie(editMovie.id, data);
-      let movie = res.data;
+      let movie = res.data.data || res.data;
       console.log('✅ Movie updated, ID:', movie.id);
       
       // Upload poster to R2 if provided
@@ -133,7 +133,7 @@ const AdminMovies = () => {
           movie.id, 
           data.poster, 
           (progressEvent) => {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            const progress = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
             setUploadProgress(prev => ({ ...prev, poster: progress }));
             console.log(`📤 Poster upload progress: ${progress}%`);
           }
@@ -151,7 +151,7 @@ const AdminMovies = () => {
           movie.id, 
           data.movieFile, 
           (progressEvent) => {
-            const progress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            const progress = progressEvent.total ? Math.round((progressEvent.loaded * 100) / progressEvent.total) : 0;
             setUploadProgress(prev => ({ ...prev, movie: progress }));
             console.log(`📤 Movie upload progress: ${progress}%`);
           }
