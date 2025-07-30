@@ -1,4 +1,6 @@
 // Debug script to show API configuration
+import API_CONFIG from './config';
+
 console.log('🔍 API Debug Information:');
 console.log('========================');
 
@@ -8,7 +10,6 @@ console.log('- NODE_ENV:', process.env.NODE_ENV);
 console.log('- REACT_APP_API_URL:', process.env.REACT_APP_API_URL);
 
 // Show the actual API URL being used
-import API_CONFIG from './config';
 const apiUrl = API_CONFIG.getApiUrl();
 console.log('- Actual API URL:', apiUrl);
 
