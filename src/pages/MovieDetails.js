@@ -55,10 +55,10 @@ const MovieDetails = () => {
         setMovie(movieRes.data);
         setReviews(reviewsRes.data);
         
-        // Get signed URL for video if available
+        // Get video URL for playback
         if (movieRes.data.movie_file_url) {
-          console.log('🎬 Movie has video file, attempting to get R2 signed URL...');
-          console.log('🔗 Direct R2 URL:', movieRes.data.movie_file_url);
+          console.log('🎬 Movie has video file, setting up R2 video playback...');
+          console.log('🔗 R2 URL:', movieRes.data.movie_file_url);
           
           // Check if it's an R2 URL
           if (movieRes.data.movie_file_url.includes('r2.dev') || movieRes.data.movie_file_url.includes('cloudflare')) {
@@ -66,40 +66,12 @@ const MovieDetails = () => {
             console.log('☁️ Confirmed: Video stored in Cloudflare R2');
           }
           
-          // Check if user is logged in
-          const token = localStorage.getItem('token');
-          if (!token) {
-            console.log('❌ No authentication token, using direct R2 URL');
-            const directUrl = getFileUrl(movieRes.data.movie_file_url);
-            console.log('🔗 Direct R2 URL:', directUrl);
-            setVideoUrl(directUrl);
-            setUrlType('direct');
-            return;
-          }
-          
-          try {
-            console.log('🔍 Calling getSignedVideoUrl for R2...');
-            const signedUrl = await getSignedVideoUrl(id);
-            if (signedUrl) {
-              console.log('✅ R2 signed URL obtained successfully!');
-              console.log('🔗 Signed URL:', signedUrl.substring(0, 100) + '...');
-              setVideoUrl(signedUrl);
-              setUrlType('signed');
-            } else {
-              console.log('⚠️ R2 signed URL generation failed, using direct R2 URL');
-              const directUrl = getFileUrl(movieRes.data.movie_file_url);
-              console.log('🔗 Direct R2 URL:', directUrl);
-              setVideoUrl(directUrl);
-              setUrlType('direct');
-            }
-          } catch (error) {
-            console.error('❌ Error getting R2 signed URL:', error);
-            console.log('🔄 Falling back to direct R2 URL');
-            const directUrl = getFileUrl(movieRes.data.movie_file_url);
-            console.log('🔗 Direct R2 URL:', directUrl);
-            setVideoUrl(directUrl);
-            setUrlType('direct');
-          }
+          // For R2 videos, use direct URLs for public access
+          // Signed URLs are only needed for private content
+          const directUrl = getFileUrl(movieRes.data.movie_file_url);
+          console.log('🔗 Using direct R2 URL for public access:', directUrl);
+          setVideoUrl(directUrl);
+          setUrlType('direct');
         } else {
           console.log('❌ No video file found for this movie');
         }
